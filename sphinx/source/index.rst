@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Docparse's documentation!
+Welcome to ReDocparse's documentation!
 ====================================
 
-.. automodule:: docparse.matcher
+.. automodule:: redocparse.matcher
    :members:

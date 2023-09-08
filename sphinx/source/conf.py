@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Docparse'
+project = 'ReDocparse'
 copyright = '2023, Carl Best'
 author = 'lapras'
 
@@ -25,6 +25,3 @@ intersphinx_mapping = {
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
-
-html_theme = 'alabaster'
-html_static_path = ['_static']

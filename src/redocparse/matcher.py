@@ -74,14 +74,3 @@ class Matcher:
                 replacer = lambda: replacer
             replacer = t.cast(t.Callable[..., str], replacer) # appease pylance
             self.inner_matchers.append(Matcher(regex)(replacer))
-
-def namify(match: str):
-    return "".join([w[0].upper() + w[1:] for w in match.split()])
-
-import inflect
-p = inflect.engine()
-
-def make_singular(match: str):
-    singular = p.singular_noun(match)
-    if isinstance(singular, str): return singular
-    return match

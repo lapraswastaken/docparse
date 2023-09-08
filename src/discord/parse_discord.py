@@ -2,6 +2,17 @@
 import os
 import redocparse.matcher as m
 
+def namify(match: str):
+    return "".join([w[0].upper() + w[1:] for w in match.split()])
+
+import inflect
+p = inflect.engine()
+
+def make_singular(match: str):
+    singular = p.singular_noun(match)
+    if isinstance(singular, str): return singular
+    return match
+
 @m.Matcher()
 def root():
     return f"""
@@ -20,7 +31,7 @@ def disc_class(name: str):
 
 @disc_class.group()
 def disc_name(name: str):
-    return m.namify(name)
+    return namify(name)
 
 noneable = " | None"
 
@@ -68,15 +79,15 @@ format_field_type.quick_steps({
 
         # Internal type references
         r"\[(.+?)\].*": lambda match: (
-            m.namify(match.group(1))
+            namify(match.group(1))
         ),
         
         # Collections
         r".*?(?:[a|A]rray|[l|L]ist) of (.+)": lambda re_match: (
-            f"list[{m.make_singular(re_match.group(1))}]"
+            f"list[{make_singular(re_match.group(1))}]"
         ),
         r".*?[m|M]ap of (.+) to (.+)": lambda re_match: (
-            f"dict[{m.make_singular(re_match.group(1))}, {m.make_singular(re_match.group(2))}]"
+            f"dict[{make_singular(re_match.group(1))}, {make_singular(re_match.group(2))}]"
         ),
 
         # Fixing 
