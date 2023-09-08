@@ -17,11 +17,28 @@ import os
 import sys
 sys.path.append(os.path.abspath("../../src"))
 
+nitpicky = True
+
+python_display_short_literal_types = True
+python_use_unqualified_type_names = True
+maximum_signature_line_length = 200
+
+import sphinx.errors
+
+def missing_reference(_app, _domain, node, _contnode):
+    print(node["reftarget"])
+    if any([ignore in node["reftarget"] for ignore in ["ClassVar", "InitVar"]]):
+        raise sphinx.errors.NoUri()
+
+def setup(app):
+    app.connect("missing-reference", missing_reference)
+
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.intersphinx"]
 
-templates_path = ['_templates']
-exclude_patterns = []
-
+autodoc_default_options = {
+    "member-order": "bysource",
+}
+autodoc_typehints_format = "short"
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
