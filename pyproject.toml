@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel", "setuptools-scm[toml]"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "docparse"
+name = "redocparse"
 authors = [
     {name = "lapras"},
 ]
@@ -16,7 +16,7 @@ dynamic = ["version"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-packages = ["docparse"]
+packages = ["redocparse"]
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"

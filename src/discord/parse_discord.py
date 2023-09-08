@@ -1,6 +1,6 @@
 
 import os
-import docparse.matcher as m
+import redocparse.matcher as m
 
 @m.Matcher()
 def root():
