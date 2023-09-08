@@ -9,6 +9,6 @@ It introduces a `docparse.matcher.Matcher` class that matches a chunk of text vi
 
 In short, it's a more ergonomic way to use regex recursively.
 
-#### Discord
+## Discord
 
-Included in this repository is src/discord, which is an application of Docparse aimed at creating Python dataclasses from the Discord API Documentation.
+Included in this repository is src/discord, which is an application of Docparse aimed at creating Python dataclasses from the Discord API Documentation (specifically for use with [DubiousDiscord](https://github.com/lapraswastaken/dubiousdiscord)).

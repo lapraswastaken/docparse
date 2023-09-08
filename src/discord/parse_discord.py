@@ -1,6 +1,5 @@
 
 import os
-import re
 import docparse.matcher as m
 
 @m.Matcher()
