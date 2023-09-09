@@ -1,12 +1,16 @@
 
 import os
+import sys
+
+import inflect
+p = inflect.engine()
+
+sys.path.append(os.path.abspath("./src"))
+
 import redocparse.matcher as m
 
 def namify(match: str):
     return "".join([w[0].upper() + w[1:] for w in match.split()])
-
-import inflect
-p = inflect.engine()
 
 def make_singular(match: str):
     singular = p.singular_noun(match)
@@ -27,18 +31,15 @@ from dubious.discord.disc import Snowflake
 
 @root.matcher(r"###### (.+?) Structure[\w\W]+?\s+\|\n\n")
 def disc_class(name: str):
-    return f"@dc.dataclass\nclass {name}:\n"
-
-@disc_class.group()
-def disc_name(name: str):
-    return namify(name)
+    return f"@dc.dataclass\nclass {namify(name)}:\n"
 
 noneable = " | None"
 
-field_pat = r"\| ([a-zA-Z_]+?\??)[ \\\*]+\| (.+?) +\| (.+?) +\|"
+field_pat = r"\| ([a-zA-Z_]+?\??)[ \\\*]+\| (?P<ftype>.+?) +\| (?P<desc>.+?) +\|"
 @disc_class.matcher(field_pat)
-def format_field(name: str, ftype: str, desc: str):
-    if not name: return ""
+def format_field(name: str, *, ftype: str, desc: str):
+    if name == "Field": name = ""
+    elif name == "global": name = "_global"
 
     if "#" in ftype:
         ftype, extra_desc = ftype.split("#")
@@ -53,17 +54,7 @@ def format_field(name: str, ftype: str, desc: str):
     
     return f'    {name}: {ftype}\n    """ {desc} """\n\n'
 
-@format_field.group()
-def format_field_name(name: str):
-    if name == "Field": name = ""
-    elif name == "global": name = "_global"
-    return name
-
-@format_field.group()
-def format_field_type(ftype: str):
-    return ftype
-
-format_field_type.quick_steps({
+format_field.group("ftype").quick_steps({
         # Raw types
         r"string": "str",
         r"(?:integer)|(?:number)": "int",
@@ -78,9 +69,7 @@ format_field_type.quick_steps({
         r"(.+)\?$": r"\1 | None",
 
         # Internal type references
-        r"\[(.+?)\].*": lambda match: (
-            namify(match.group(1))
-        ),
+        r"\[(.+?)\].*": lambda re_match: namify(re_match.group(1)),
         
         # Collections
         r".*?(?:[a|A]rray|[l|L]ist) of (.+)": lambda re_match: (
@@ -90,34 +79,26 @@ format_field_type.quick_steps({
             f"dict[{make_singular(re_match.group(1))}, {make_singular(re_match.group(2))}]"
         ),
 
-        # Fixing 
+        # Fixing audit log things
         r"^mixed(.*)": r"t.Any# \1",
 })
 
-@format_field.group()
-def format_field_desc(desc: str):
-    return desc
-
-format_field_desc.quick_steps({
+format_field.group("desc").quick_steps({
     r"\[(.+?)\]\(.+\)": r"`\1`"
 })
 
 
 if __name__ == "__main__":
-
-    inp: list[str] = []
-    path_root = os.path.join("src/docparse/discord-api-docs", "docs")
-    for folder in ["interactions", "resources"]:
-        path_folder = os.path.join(path_root, folder)
-        for file in os.listdir(path_folder):
-            path_file = os.path.join(path_folder, file)
-            with open(path_file, "r") as f:
-                inp.append(f.read())
-    path_topics_folder = os.path.join(path_root, "topics")
-    for specific in ["OAuth2.md", "Permissions.md", "Teams.md"]:
-        path_file = os.path.join(path_topics_folder, specific)
-        with open(path_file, "r") as f:
-            inp.append(f.read())
-
-    with open("src/docparse/api.py", "w") as f:
-        f.write(root.process("\n\n\n".join(content for content in inp)))
+    root.process_files({
+        "src/discord/discord-api-docs": {
+            "docs": {
+                "interactions": "*",
+                "resources": "*",
+                "topics": [
+                    "OAuth2.md",
+                    "Permissions.md",
+                    "Teams.md",
+                ],
+            },
+        },
+    }, "src/discord/api.py", "src/discord/logs")
