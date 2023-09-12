@@ -7,7 +7,7 @@ p = inflect.engine()
 
 sys.path.append(os.path.abspath("./src"))
 
-import redocparse.matcher as m
+from redocparse import files, logs, matcher
 
 def namify(s: str):
     return "".join([w[0].upper() + w[1:] for w in s.split()])
@@ -17,7 +17,7 @@ def make_singular(s: str):
     if isinstance(singular, str): return singular
     return s
 
-@m.Matcher(r"[\w\W]+")
+@matcher.Matcher(r"[\w\W]+")
 def root():
     return f"""
 from __future__ import annotations
@@ -54,7 +54,7 @@ def format_field(name: str, *, ftype: str, desc: str):
     
     return f'    {name}: {ftype}\n    """ {desc} """\n\n'
 
-format_ftype = format_field.group("ftype").add(m.substitution_matchers({
+format_ftype = format_field.group("ftype").add(matcher.substitution_matchers({
     # Raw types
     r"string": "str",
     r"(?:integer)|(?:number)": "int",
@@ -85,13 +85,13 @@ format_ftype = format_field.group("ftype").add(m.substitution_matchers({
     r"^mixed(.*)": r"t.Any# \1",
 }))
 
-format_desc = format_field.group("desc").add(m.substitution_matchers({
+format_desc = format_field.group("desc").add(matcher.substitution_matchers({
     r"\[(.+?)\]\(.+\)": r"`\1`"
 }))
 
 
 if __name__ == "__main__":
-    root.process_files({
+    content = files.Contents({
         "src/discord/discord-api-docs": {
             "docs": {
                 "interactions": "*",
@@ -103,4 +103,7 @@ if __name__ == "__main__":
                 ],
             },
         },
-    }, "src/discord/api.py", logsfolder="src/discord/logs")
+    })
+    log = logs.Log()
+    root.process(content.all_contents, log=log)
+    logs.write_logfile("src/discord/logs", content.transform_log(log).as_str())
