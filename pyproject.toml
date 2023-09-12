@@ -1,9 +1,10 @@
 [build-system]
-requires = ["setuptools", "wheel", "setuptools-scm[toml]"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "redocparse"
+version = "0.1.0"
 authors = [
     {name = "lapras"},
 ]
@@ -12,11 +13,6 @@ readme = "README.md"
 requires-python = ">=3.10"
 keywords = ["docparse", "documentation", "regex", "recursive regex"]
 
-dynamic = ["version"]
-
 [tool.setuptools]
 package-dir = {"" = "src"}
 packages = ["redocparse"]
-
-[tool.setuptools_scm]
-local_scheme = "no-local-version"
