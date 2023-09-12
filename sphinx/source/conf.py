@@ -26,7 +26,7 @@ maximum_signature_line_length = 200
 import sphinx.errors
 
 def missing_reference(_app, _domain, node, _contnode):
-    print(node["reftarget"])
+    #print(node["reftarget"])
     if any([ignore in node["reftarget"] for ignore in ["ClassVar", "InitVar"]]):
         raise sphinx.errors.NoUri()
 
@@ -35,10 +35,12 @@ def setup(app):
 
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.intersphinx"]
 
+autodoc_type_aliases = {
+    "AgentAssignment": "AgentAssignment"
+}
 autodoc_default_options = {
     "member-order": "bysource",
 }
-autodoc_typehints_format = "short"
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),

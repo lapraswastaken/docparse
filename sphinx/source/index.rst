@@ -4,5 +4,7 @@ ReDocparse
 
 .. automodule:: redocparse
 
-.. automodule:: redocparse.matcher
-   :members:
+.. toctree::
+   redocparse/matcher
+   redocparse/logs
+   redocparse/files
